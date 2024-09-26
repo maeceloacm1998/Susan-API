@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+      "target": "es2016",
+      "module": "commonjs",
+      "baseUrl": ".",
+      "outDir": "./",
+      "paths": {
+        "@/*": ["./src/*"],
+        "@controllers/*": ["./src/controller/*"],
+        "@helpers/*": ["./src/helpers/*"],
+        "@routes/*": ["./src/routes/*"],
+        "@services/*": ["./src/services/*"],
+        "@middlewares/*": ["./src/middlewares/*"],
+        "@validations/*": ["./src/validations/*"],
+        "@models/*": ["./src/models/*"]
+      },
+      "types": ["node", "express"],
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "strict": true,
+      "skipLibCheck": true,
+      "lib": ["ESNext"],
+      "allowJs": false,
+      "noEmit": true,
+      "resolveJsonModule": true,
+      "isolatedModules": false,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noFallthroughCasesInSwitch": true,
+      "strictNullChecks": true
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+  }
