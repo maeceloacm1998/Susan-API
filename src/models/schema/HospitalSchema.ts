@@ -21,4 +21,4 @@ const HospitalSchema: Schema = new Schema({
   },
 });
 
-export default mongoose.model<IHospitalSchema>('Hospitals', HospitalSchema);
+export default mongoose.model<IHospitalSchema>('hospitals', HospitalSchema);
