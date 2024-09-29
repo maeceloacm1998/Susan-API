@@ -32,6 +32,12 @@ const EnvSchema = z.object({
     })
     .min(3)
     .max(50),
+    GERMINI_API_KEY: z.string({
+      description: "ChatGPT API Key",
+      required_error: "😱 you need add chatgpt key",
+    })
+    .min(3)
+    .max(200),
   PORT: z.coerce
     .number({
       description:

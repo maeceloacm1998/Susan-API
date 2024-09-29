@@ -1,27 +1,14 @@
-import { addHospitalData } from "@/migrations/adddatadb.migrations";
-import { HospitalDTO } from "@/models/types/dto/hospital.dto";
+
 import { StatusCode } from "@/models/types/status.code";
+import { ChatService } from "@/services/chat.service";
 import { Request, Response } from "express";
 
 async function getHospitalMigrations(req: Request, res: Response) {
-  const hospitaList: Array<HospitalDTO> = req.body;
+  const messa: string = req.query.message as string;
 
-  const response = await addHospitalData(hospitaList);
+  const message = await new ChatService().sendMessage(messa);
 
-  switch (response.status) {
-    case StatusCode.Success: {
-      res.status(parseInt(StatusCode.Success)).send({
-        status: StatusCode.Success,
-        result: response.result,
-      });
-      break;
-    }
-
-    case StatusCode.notFound: {
-      res.status(parseInt(StatusCode.notFound)).send();
-      break;
-    }
-  }
+  res.status(parseInt(StatusCode.Success)).send(message);
 }
 
 export { getHospitalMigrations };
