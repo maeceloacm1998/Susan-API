@@ -1,5 +1,4 @@
 import { getEmergency } from "@/controller/susan.controller";
-import { validateEmergency } from "@/models/validations/validator";
 import { Router } from "express";
 
 function susanRoutes(route: Router) {
@@ -14,7 +13,7 @@ function susanRoutes(route: Router) {
    */
   route
     .route("/api/search/emergency")
-    .get(validateEmergency, getEmergency);
+    .get(getEmergency);
 }
 
 export { susanRoutes };

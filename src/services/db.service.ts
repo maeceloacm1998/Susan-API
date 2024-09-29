@@ -1,10 +1,11 @@
+import { EmergencyObjects } from "@/models/types/emergency.response.model";
 import { PlaceStatus } from "@/models/types/PlaceStatus";
 import { StatusCode } from "@/models/types/status.code";
 import hospitalSchema from "@models/schema/HospitalSchema";
 
 /**
  * Exemplo de como pegar o dado na api e filtrar os hospitais por distancia.
- * 
+ *
  */
 async function getHospital({
   lat,
@@ -12,9 +13,9 @@ async function getHospital({
 }: {
   lat: number;
   lng: number;
-}): Promise<PlaceStatus<any>> {
+}): Promise<PlaceStatus<EmergencyObjects>> {
   try {
-    const hospitalList = await hospitalSchema.aggregate([
+    const hospital = await hospitalSchema.aggregate([
       {
         $geoNear: {
           near: {
@@ -30,9 +31,17 @@ async function getHospital({
 
     return {
       status: StatusCode.Success,
-      result: hospitalList,
+      result: {
+        name: hospital[0].name,
+        distance: hospital[0].distance,
+        phoneNumber: hospital[0].phoneNumber,
+        address: hospital[0].address,
+        lat: hospital[0].location.coordinates[1],
+        lng: hospital[0].location.coordinates[0],
+      },
     };
   } catch (e) {
+    console.error(e);
     return {
       status: StatusCode.notFound,
       result: [] as any,
