@@ -6,7 +6,7 @@ async function getEmergency(req: Request, res: Response) {
   const lat = Number(req.query.latitude);
   const lng = Number(req.query.longitude);
 
-  const message = String(req.query.message);
+  // const message = String(req.query.message);
 
   // 1 Passo - Precisa do servico do chatGPT ou Germini para entender qual tipo de emergencia.
   // 2 Passo - A partir do tipo, chamar o servico especifico para cada emergencia.

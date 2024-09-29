@@ -32,13 +32,6 @@ const EnvSchema = z.object({
     })
     .min(3)
     .max(50),
-  PLACE_API_KEY: z
-    .string({
-      description: "Google Place API Key",
-      required_error: "😱 You forgot to add a Google Place API Key",
-    })
-    .min(3)
-    .max(50),
   PORT: z.coerce
     .number({
       description:

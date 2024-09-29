@@ -4,7 +4,6 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon -e ts,js --exec ts-node -r tsconfig-paths/register app.ts",
-    "debug": "ndb app.ts",
     "migrate": "ts-node ./src/migrations/index.ts"
   },
   "author": "",

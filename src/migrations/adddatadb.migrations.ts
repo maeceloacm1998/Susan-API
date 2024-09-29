@@ -13,10 +13,7 @@ async function addHospitalData(
         address: hospital.address,
         geometry: hospital.geometry,
         phoneNumber: hospital.phoneNumber,
-        location: {
-          type: "Point",
-          coordinates: hospital.location.coordinates,
-        },
+        location: hospital.location,
       });
 
       await newHospital.save();
