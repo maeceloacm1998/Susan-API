@@ -3,7 +3,7 @@ import { EmergencyResponse } from "@/models/types/emergency.response.model";
 import { EmergencyType } from "@/models/types/emergency.types.model";
 import { StatusCode } from "@/models/types/status.code";
 import { ChatService } from "@/services/chat.service";
-import { getHospital } from "@/services/db.service";
+import { getHospital, getPolicy } from "@/services/db.service";
 import { Request, Response } from "express";
 
 async function getEmergency(req: Request, res: Response) {
@@ -44,7 +44,32 @@ async function getEmergency(req: Request, res: Response) {
     }
 
     case EmergencyType.Police: {
-      // Call police service
+      const policy = await getPolicy({
+        lat,
+        lng,
+      });
+
+      switch (policy.status) {
+        case StatusCode.Success: {
+          const messageResponse = await generatePolicyResponseMessage(
+            message,
+            germiniChat
+          );
+          res.status(parseInt(StatusCode.Success)).send({
+            status: StatusCode.Success,
+            result: {
+              message: messageResponse,
+              data: policy.result,
+            } as EmergencyResponse,
+          });
+          break;
+        }
+
+        case StatusCode.notFound: {
+          res.status(parseInt(StatusCode.notFound)).send();
+          break;
+        }
+      }
       break;
     }
 
@@ -54,16 +79,20 @@ async function getEmergency(req: Request, res: Response) {
     }
 
     case EmergencyType.Others: {
-      // Call LLM to return help message
+      const messageResponse = await generateGenericResponseMessage(
+        message,
+        germiniChat
+      );
+      res.status(parseInt(StatusCode.Success)).send({
+        status: StatusCode.Success,
+        result: {
+          message: messageResponse,
+          data: {},
+        } as EmergencyResponse,
+      });
       break;
     }
   }
-
-  // 1 Passo - Precisa do servico do chatGPT ou Germini para entender qual tipo de emergencia.
-  // 2 Passo - A partir do tipo, chamar o servico especifico para cada emergencia.
-  // Os Tipos sao: hospital, police, fire ou other.
-  // 3 Passo - Retornar o servico mais proximo do tipo solicitado.
-  // 4 Passo - OPCIONAL - Caso o servico seja other, chamar a LLM para retornar mensagem de ajuda.
 }
 
 async function getEmergencyType(
@@ -85,6 +114,26 @@ async function generateHospitalResponseMessage(
 ): Promise<string> {
   const responses = await chat.sendMessage(
     `Preciso de uma mensagem amigavel mostrando qual especialidade ele precisa buscar e que ele precisa ir ao hospital. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um hospital mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do hospital.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
+  );
+  return responses;
+}
+
+async function generatePolicyResponseMessage(
+  message: string,
+  chat: ChatService
+): Promise<string> {
+  const responses = await chat.sendMessage(
+    `Preciso de uma mensagem amigavel falando para a pessoa procurar um batalhao ou local de policia. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
+  );
+  return responses;
+}
+
+async function generateGenericResponseMessage(
+  message: string,
+  chat: ChatService
+): Promise<string> {
+  const responses = await chat.sendMessage(
+    `Preciso de uma mensagem amigavel falando para a pessoa que nao conseguiu encontrar uma emergencia para recomendar. Baseie a resposta nessa mensagem: ${message}.`
   );
   return responses;
 }

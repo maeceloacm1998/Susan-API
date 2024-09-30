@@ -1,44 +1,46 @@
-// import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
-// import hospitalSchema from '../models/schema/HospitalSchema';
-// import { env } from '../helpers/env';
+import policyScheme from '../models/schema/PolicyScheme';
+import { env } from '../helpers/env';
 
-// export async function addLocationToHospitalSchema() {
-//   try {
-//     await mongoose.connect(env.MONGODB_URI, {
-//       dbName: env.DB_NAME,
-//       user: env.DB_USER,
-//       pass: env.DB_PASS,
-//     });
+export async function addLocationToHospitalSchema() {
+  try {
+    await mongoose.connect(env.MONGODB_URI, {
+      dbName: env.DB_NAME,
+      user: env.DB_USER,
+      pass: env.DB_PASS,
+    });
 
-//     const documents = await hospitalSchema.find({});
+    const documents = await policyScheme.find({});
 
-//     const bulkOps = documents.map((document) => ({
-//       updateOne: {
-//         filter: { _id: document._id },
-//         update: {
-//           $set: {
-//             location: {
-//               type: 'Point',
-//               coordinates: [
-//                 document.geometry.location.lng,
-//                 document.geometry.location.lat,
-//               ],
-//             },
-//           },
-//         },
-//       },
-//     }));
+    const bulkOps = documents.map((document) => {
+      const geometry = document.geometry as unknown as {
+          lat: any;
+          lng: any; location: { lng: number, lat: number } 
+};
 
-//     await hospitalSchema.bulkWrite(bulkOps);
+      return {
+        updateOne: {
+          filter: { _id: document._id },
+          update: {
+            $set: {
+              location: {
+                type: 'Point',
+                coordinates: [geometry.lng, geometry.lat],
+              },
+            },
+          },
+        },
+      };
+    });
 
-//     // Create 2dsphere index on location field
-//     await hospitalSchema.collection.createIndex({ location: '2dsphere' });
-
-//     console.log('Migration completed successfully!');
-//   } catch (error) {
-//     console.error('Error during migration:', error);
-//   } finally {
-//     mongoose.disconnect();
-//   }
-// }
+    await policyScheme.bulkWrite(bulkOps);
+    
+    // Create 2dsphere index on location field
+    await policyScheme.collection.createIndex({ location: '2dsphere' });
+  } catch (error) {
+    console.error('Error during migration:', error);
+  } finally {
+    await mongoose.disconnect();
+  }
+}
