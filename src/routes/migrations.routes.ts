@@ -1,4 +1,5 @@
 import {
+  getFireMigrations,
   getHospitalMigrations,
   getPolicyMigrations,
 } from "@/controller/migrations.controller";
@@ -17,6 +18,7 @@ function migrationRoutes(route: Router) {
   route.route("/api/migrations/hospital").post(getHospitalMigrations);
 
   route.route("/api/migrations/policy").post(getPolicyMigrations);
+  route.route("/api/migrations/fire").post(getFireMigrations);
 }
 
 export { migrationRoutes };

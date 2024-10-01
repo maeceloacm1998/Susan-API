@@ -1,9 +1,10 @@
-import { addHospitalData, addPolicy } from "@/migrations/adddatadb.migrations";
+import { addFire, addHospitalData, addPolicy } from "@/migrations/adddatadb.migrations";
 import { HospitalDTO } from "@/models/types/dto/hospital.dto";
 import { StatusCode } from "@/models/types/status.code";
 import {
   placeAutoComplete,
   placeHospitalDetails,
+  searchPlaces,
 } from "@/services/maps.service";
 import { LatLngLiteral } from "@googlemaps/google-maps-services-js";
 import { Request, Response } from "express";
@@ -71,4 +72,37 @@ async function getPolicyMigrations(req: Request, res: Response) {
   });
 }
 
-export { getHospitalMigrations, getPolicyMigrations };
+async function getFireMigrations(req: Request, res: Response) {
+  const { dale } = req.body;
+  console.log(dale);
+  const getFirePlaces = await searchPlaces("corpo de bombeiros em belo horizonte")
+  console.log(getFirePlaces.result);
+  if (getFirePlaces.result.length === 0) {
+    return res
+      .status(parseInt(StatusCode.notFound))
+      .send({ error: "Fire not found" });
+  }
+
+
+  getFirePlaces.result
+    .filter((fire) => fire !== undefined)
+    .map(async (fire) => {
+      const place = await placeHospitalDetails(fire.place_id);
+
+      addFire({
+        name: fire.name,
+        address: place.result.result.formatted_address,
+        phoneNumber: place.result.result.formatted_phone_number,
+        geometry: {
+          lat: fire.geometry.location.lat,
+          lng: fire.geometry.location.lng,
+        },
+        location: {
+          type: "Point",
+          coordinates: [fire.geometry.location.lng, fire.geometry.location.lat],
+        },
+      });
+    });
+}
+
+export { getHospitalMigrations, getPolicyMigrations, getFireMigrations };

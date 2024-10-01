@@ -5,6 +5,7 @@ import {
   Language,
   PlaceAutocompleteRequest,
   PlaceAutocompleteResult,
+  PlaceData,
   PlaceDetailsRequest,
   PlaceDetailsResponseData,
 } from "@googlemaps/google-maps-services-js";
@@ -62,3 +63,31 @@ export async function placeHospitalDetails(
     };
   }
 }
+
+export async function searchPlaces(query: string): Promise<PlaceStatus<(PlaceData | undefined)[]>> {
+  const client = new Client({});
+
+  try {
+    const response = await client.textSearch({
+      params: {
+        query: query,
+        language: Language.pt_BR,
+        key: "AIzaSyC90GoRw5i2ku37yIumudCbgSFS3aT9K6c",
+      },
+    });
+
+    if (response.data.status === 'OK') {
+      return {
+        status: StatusCode.Success,
+        result: response.data.results as (PlaceData | undefined)[],
+      };
+    } else {
+      console.error('Error fetching places:', response.data.status);
+      return [] as any;
+    }
+  } catch (error) {
+    console.error('Error fetching places:', error);
+    return [] as any;
+  }
+}
+

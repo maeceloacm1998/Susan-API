@@ -1,5 +1,7 @@
+import FireScheme from "@/models/schema/FireScheme";
 import HospitalSchema from "@/models/schema/HospitalSchema";
 import PolicyScheme from "@/models/schema/PolicyScheme";
+import { FireDTO } from "@/models/types/dto/fire.dto";
 import { HospitalDTO } from "@/models/types/dto/hospital.dto";
 import { PolicyDTO } from "@/models/types/dto/policy.dto";
 import { PlaceStatus } from "@/models/types/PlaceStatus";
@@ -57,4 +59,37 @@ async function addPolicy(data: PolicyDTO): Promise<PlaceStatus<PolicyDTO>> {
   }
 }
 
-export { addHospitalData, addPolicy };
+async function addFire(data: FireDTO): Promise<PlaceStatus<FireDTO>> {
+  try {
+    const newFire = new FireScheme({
+      name: data.name,
+      address: data.address,
+      geometry: data.geometry,
+      phoneNumber: data.phoneNumber,
+      location: data.location,
+    });
+
+    await newFire.save();
+
+    return {
+      status: StatusCode.Success,
+      result: data,
+    };
+  } catch (error) {
+    return {
+      status: StatusCode.BadRequest,
+      result: {} as PolicyDTO,
+    };
+  }
+}
+
+export async function updateFire(fireName: string, data: FireDTO) {
+  try {
+    await FireScheme.findOneAndUpdate({ name: fireName }, data, { new: true });
+  } catch (error) {
+    console.error('Error updating fire:', error);
+
+  }
+}
+
+export { addHospitalData, addPolicy, addFire };
