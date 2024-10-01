@@ -3,7 +3,7 @@ import { EmergencyResponse } from "@/models/types/emergency.response.model";
 import { EmergencyType } from "@/models/types/emergency.types.model";
 import { StatusCode } from "@/models/types/status.code";
 import { ChatService } from "@/services/chat.service";
-import { getHospital, getPolicy } from "@/services/db.service";
+import { getFire, getHospital, getPolicy } from "@/services/db.service";
 import { Request, Response } from "express";
 
 async function getEmergency(req: Request, res: Response) {
@@ -74,7 +74,32 @@ async function getEmergency(req: Request, res: Response) {
     }
 
     case EmergencyType.Firefighters: {
-      // Call firefighters service
+      const fire = await getFire({
+        lat,
+        lng,
+      });
+
+      switch (fire.status) {
+        case StatusCode.Success: {
+          const messageResponse = await generateFireResponseMessage(
+            message,
+            germiniChat
+          );
+          res.status(parseInt(StatusCode.Success)).send({
+            status: StatusCode.Success,
+            result: {
+              message: messageResponse,
+              data: fire.result,
+            } as EmergencyResponse,
+          });
+          break;
+        }
+
+        case StatusCode.notFound: {
+          res.status(parseInt(StatusCode.notFound)).send();
+          break;
+        }
+      }
       break;
     }
 
@@ -124,6 +149,16 @@ async function generatePolicyResponseMessage(
 ): Promise<string> {
   const responses = await chat.sendMessage(
     `Preciso de uma mensagem amigavel falando para a pessoa procurar um batalhao ou local de policia. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
+  );
+  return responses;
+}
+
+async function generateFireResponseMessage(
+  message: string,
+  chat: ChatService
+): Promise<string> {
+  const responses = await chat.sendMessage(
+    `Preciso de uma mensagem amigavel falando para a pessoa procurar um batalhao ou local de bombeiros. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao de bombeiros.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES. SEM PREFIXOS`
   );
   return responses;
 }
