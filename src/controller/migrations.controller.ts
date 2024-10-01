@@ -1,4 +1,8 @@
-import { addFire, addHospitalData, addPolicy } from "@/migrations/adddatadb.migrations";
+import {
+  addFire,
+  addHospitalData,
+  addPolicy,
+} from "@/migrations/adddatadb.migrations";
 import { HospitalDTO } from "@/models/types/dto/hospital.dto";
 import { StatusCode } from "@/models/types/status.code";
 import {
@@ -75,14 +79,15 @@ async function getPolicyMigrations(req: Request, res: Response) {
 async function getFireMigrations(req: Request, res: Response) {
   const { dale } = req.body;
   console.log(dale);
-  const getFirePlaces = await searchPlaces("corpo de bombeiros em belo horizonte")
+  const getFirePlaces = await searchPlaces(
+    "corpo de bombeiros em belo horizonte"
+  );
   console.log(getFirePlaces.result);
   if (getFirePlaces.result.length === 0) {
     return res
       .status(parseInt(StatusCode.notFound))
       .send({ error: "Fire not found" });
   }
-
 
   getFirePlaces.result
     .filter((fire) => fire !== undefined)
