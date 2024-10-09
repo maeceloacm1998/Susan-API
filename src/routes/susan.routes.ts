@@ -13,7 +13,7 @@ function susanRoutes(route: Router) {
    */
   route
     .route("/api/search/emergency")
-    .get(getEmergency);
+    .post(getEmergency);
 }
 
 export { susanRoutes };

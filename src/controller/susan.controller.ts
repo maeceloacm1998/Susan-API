@@ -138,7 +138,7 @@ async function generateHospitalResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem amigavel mostrando qual especialidade ele precisa buscar e que ele precisa ir ao hospital. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um hospital mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do hospital.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
+    `Preciso de uma mensagem seria e completa mostrando qual especialidade ele precisa buscar e que ele precisa ir ao hospital. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um hospital mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do hospital.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
   );
   return responses.replace(/\[.*?\]/g, '');
 }
@@ -148,7 +148,7 @@ async function generatePolicyResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem amigavel falando para a pessoa procurar um batalhao ou local de policia. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
+    `Preciso de uma mensagem seria e completa falando para a pessoa procurar um batalhao ou local de policia. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
   );
   return responses.replace(/\[.*?\]/g, '');
 }
@@ -158,7 +158,7 @@ async function generateFireResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem amigavel falando para a pessoa procurar um batalhao ou local de bombeiros. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao de bombeiros.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES. SEM PREFIXOS`
+    `Preciso de uma mensagem seria e completa falando para a pessoa procurar um batalhao ou local de bombeiros. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao de bombeiros.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES. SEM PREFIXOS`
   );
   return responses.replace(/\[.*?\]/g, '');
 }
@@ -168,7 +168,7 @@ async function generateGenericResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem amigavel falando para a pessoa que nao conseguiu encontrar uma emergencia para recomendar. Baseie a resposta nessa mensagem: ${message}.`
+    `Preciso de uma mensagem seria e completa falando para a pessoa que nao conseguiu encontrar uma emergencia para recomendar. Baseie a resposta nessa mensagem: ${message}.`
   );
   return responses.replace(/\[.*?\]/g, '');
 }
