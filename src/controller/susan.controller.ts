@@ -10,6 +10,7 @@ async function getEmergency(req: Request, res: Response) {
   const germiniChat = new ChatService();
 
   const { lat, lng, message }: EmergencyRequest = req.body;
+  console.log(lat, lng, message);
   const emergencyType = await getEmergencyType(message, germiniChat);
 
   switch (emergencyType.trim()) {
@@ -25,6 +26,8 @@ async function getEmergency(req: Request, res: Response) {
             message,
             germiniChat
           );
+          console.log('messagem', messageResponse);
+          console.log('hospital', hospital.result);
           res.status(parseInt(StatusCode.Success)).send({
             status: StatusCode.Success,
             result: {
