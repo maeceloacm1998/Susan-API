@@ -10,7 +10,7 @@ async function getEmergency(req: Request, res: Response) {
   const germiniChat = new ChatService();
 
   const { lat, lng, message }: EmergencyRequest = req.body;
-  console.log(lat, lng, message);
+  log("Request Body", JSON.stringify(req.body));
   const emergencyType = await getEmergencyType(message, germiniChat);
 
   switch (emergencyType.trim()) {
@@ -26,8 +26,10 @@ async function getEmergency(req: Request, res: Response) {
             message,
             germiniChat
           );
-          console.log('messagem', messageResponse);
-          console.log('hospital', hospital.result);
+
+          log("response - hospital", messageResponse);
+          log("response - hospital", hospital.result.toString());
+
           res.status(parseInt(StatusCode.Success)).send({
             status: StatusCode.Success,
             result: {
@@ -58,6 +60,10 @@ async function getEmergency(req: Request, res: Response) {
             message,
             germiniChat
           );
+
+          log("response - policy", messageResponse);
+          log("response - policy", policy.result.toString());
+          
           res.status(parseInt(StatusCode.Success)).send({
             status: StatusCode.Success,
             result: {
@@ -88,6 +94,10 @@ async function getEmergency(req: Request, res: Response) {
             message,
             germiniChat
           );
+
+          log("response - bombeiros", messageResponse);
+          log("response - bombeiros", fire.result.toString());
+
           res.status(parseInt(StatusCode.Success)).send({
             status: StatusCode.Success,
             result: {
@@ -111,6 +121,9 @@ async function getEmergency(req: Request, res: Response) {
         message,
         germiniChat
       );
+
+      log("response - others", messageResponse);
+      
       res.status(parseInt(StatusCode.Success)).send({
         status: StatusCode.Success,
         result: {
@@ -141,9 +154,16 @@ async function generateHospitalResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem seria e completa mostrando qual especialidade ele precisa buscar e que ele precisa ir ao hospital. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um hospital mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do hospital.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
+    `
+      Crie uma mensagem resumida, sem uso de figurinhas, emojis ou caracteres especiais.
+      Escreva a mensagem orientando a pessoa e buscar o hospital mais proximo dela. 
+      Baseie a resposta nessa mensagem: ${message}, que foi enviada pelo usuario. 
+      Recomende sempre uma especialidade que ele deve buscar ao ir no hospital.
+      No final da frase, SEMPRE falar que a baixo tem um hospital mais proximo, esse hospital foi selecionado no nosso banco de dados.
+      NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.
+    `
   );
-  return responses.replace(/\[.*?\]/g, '');
+  return responses.replace(/\[.*?\]/g, "").replace(/[\n\r\*\_]/g, "").trim();
 }
 
 async function generatePolicyResponseMessage(
@@ -151,9 +171,15 @@ async function generatePolicyResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem seria e completa falando para a pessoa procurar um batalhao ou local de policia. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.`
+    `
+      Crie uma mensagem resumida, sem uso de figurinhas, emojis ou caracteres especiais.
+      Escreva a mensagem orientando a pessoa ligar e buscar a delegacia de policia mais proximo dela. 
+      Baseie a resposta nessa mensagem: ${message}, que foi enviada pelo usuario. 
+      No final da frase, SEMPRE falar que a baixo tem uma delegacia mais proximo, essa delegacia foi selecionado no nosso banco de dados.
+      NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.
+    `
   );
-  return responses.replace(/\[.*?\]/g, '');
+  return responses.replace(/\[.*?\]/g, "").replace(/[\n\r\*\_]/g, "").trim();
 }
 
 async function generateFireResponseMessage(
@@ -161,9 +187,15 @@ async function generateFireResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem seria e completa falando para a pessoa procurar um batalhao ou local de bombeiros. Baseie a resposta nessa mensagem: ${message}. No final, fale que estou recomendando um batalhao mais proximo e que a baixo tem link para o Uber, google maps ou waze. Colocar mensagem generica, sem dados do batalhao de bombeiros.  NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES. SEM PREFIXOS`
+    `
+      Crie uma mensagem resumida, sem uso de figurinhas, emojis ou caracteres especiais.
+      Escreva a mensagem orientando a pessoa ligar e buscar o corpo de bombeiros mais proximo dela. 
+      Baseie a resposta nessa mensagem: ${message}, que foi enviada pelo usuario. 
+      No final da frase, SEMPRE falar que a baixo tem um corpo de bombeiros mais proximo, esse corpo de bombeiros foi selecionado no nosso banco de dados.
+      NAO COLOCAR PREFIXOS PARA SUBSTITUIR POR NOMES.
+    `
   );
-  return responses.replace(/\[.*?\]/g, '');
+  return responses.replace(/\[.*?\]/g, "").replace(/[\n\r\*\_]/g, "").trim();
 }
 
 async function generateGenericResponseMessage(
@@ -171,9 +203,24 @@ async function generateGenericResponseMessage(
   chat: ChatService
 ): Promise<string> {
   const responses = await chat.sendMessage(
-    `Preciso de uma mensagem seria e completa falando para a pessoa que nao conseguiu encontrar uma emergencia para recomendar. Baseie a resposta nessa mensagem: ${message}.`
+    `Preciso de uma mensagem seria, sem emojis, curta, falando para a pessoa que nao conseguiu encontrar uma emergencia para recomendar. Baseie a resposta nessa mensagem: ${message}.`
   );
-  return responses.replace(/\[.*?\]/g, '');
+  return responses.replace(/\[.*?\]/g, "").replace(/[\n\r\*\_]/g, "").trim();
+}
+
+function log(key: string, data: any) {
+  console.log(`LOG - ${getCurrentDate()} [${key}] ${data}`);
+}
+
+function getCurrentDate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Mês começa do 0
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 export { getEmergency };
