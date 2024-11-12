@@ -12,7 +12,7 @@ async function getEmergency(req: Request, res: Response) {
   const { lat, lng, message }: EmergencyRequest = req.body;
   log("Request Body", JSON.stringify(req.body));
   const emergencyType = await getEmergencyType(message, germiniChat);
-
+  log("Emergency Type", emergencyType);
   switch (emergencyType.trim()) {
     case EmergencyType.Hospital: {
       const hospital = await getHospital({
@@ -63,12 +63,12 @@ async function getEmergency(req: Request, res: Response) {
 
           log("response - policy", messageResponse);
           log("response - policy", policy.result.toString());
-          
+
           res.status(parseInt(StatusCode.Success)).send({
             status: StatusCode.Success,
             result: {
               message: messageResponse,
-              data: policy.result,
+              data: {...policy.result, phoneNumber: "190"},
             } as EmergencyResponse,
           });
           break;
@@ -102,7 +102,7 @@ async function getEmergency(req: Request, res: Response) {
             status: StatusCode.Success,
             result: {
               message: messageResponse,
-              data: fire.result,
+              data: {...fire.result, phoneNumber: "193"},
             } as EmergencyResponse,
           });
           break;
@@ -123,7 +123,25 @@ async function getEmergency(req: Request, res: Response) {
       );
 
       log("response - others", messageResponse);
-      
+
+      res.status(parseInt(StatusCode.Success)).send({
+        status: StatusCode.Success,
+        result: {
+          message: messageResponse,
+          data: {},
+        } as EmergencyResponse,
+      });
+      break;
+    }
+
+    default: {
+      const messageResponse = await generateGenericResponseMessage(
+        message,
+        germiniChat
+      );
+
+      log("response - default", messageResponse);
+
       res.status(parseInt(StatusCode.Success)).send({
         status: StatusCode.Success,
         result: {
@@ -144,7 +162,9 @@ async function getEmergencyType(
   const responses = await chat.sendMessage(
     `What type of emergency is this? ${message}, my services are: ${types.join(
       ", "
-    )}. Send only the type of emergency.`
+    )}. Send only the type of emergency. Don't send anything else, only the type of emergency and types are: ${types.join(
+      ", "
+    )}.`
   );
   return responses;
 }
