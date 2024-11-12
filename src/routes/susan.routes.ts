@@ -1,4 +1,5 @@
 import { getEmergency } from "@/controller/susan.controller";
+import { handleEmergencyResult } from "@/controller/susan.result.controller";
 import { Router } from "express";
 
 function susanRoutes(route: Router) {
@@ -14,6 +15,10 @@ function susanRoutes(route: Router) {
   route
     .route("/api/search/emergency")
     .post(getEmergency);
+
+    route
+    .route("/api/search/emergency/result")
+    .post(handleEmergencyResult);
 }
 
 export { susanRoutes };
