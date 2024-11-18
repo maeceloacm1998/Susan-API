@@ -11,7 +11,7 @@ export class ChatService {
 
   async sendMessage(message: string): Promise<string> {
     try {
-      const model = this.germini.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = this.germini.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
       const result = await model.generateContent(message);
   
       return result.response.text();
