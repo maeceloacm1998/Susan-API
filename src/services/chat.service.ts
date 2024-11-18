@@ -24,8 +24,10 @@ export class ChatService {
         throw new Error(
           `Failed to communicate with Germini API: ${error.response.data.error.message}`
         );
+      } else {
+        console.error("Unexpected error:", error);
+        throw new Error("Unexpected error occurred");
       }
-      throw new Error("An unexpected error occurred");
     }
   }
 }
