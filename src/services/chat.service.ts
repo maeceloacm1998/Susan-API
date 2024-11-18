@@ -21,12 +21,10 @@ export class ChatService {
           "Error communicating with Germini API:",
           error.response.data
         );
-        throw new Error(
-          `Failed to communicate with Germini API: ${error.response.data.error.message}`
-        );
+        return "I'm sorry, I'm having trouble understanding you right now.";
       } else {
         console.error("Unexpected error:", error);
-        throw new Error("Unexpected error occurred");
+        return "I'm sorry, I'm having trouble understanding you right now.";
       }
     }
   }
